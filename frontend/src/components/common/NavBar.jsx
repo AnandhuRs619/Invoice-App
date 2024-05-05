@@ -8,6 +8,8 @@ import Typography from '@mui/material/Typography';
 import InputBase from '@mui/material/InputBase';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
+import CreateInvoiceButton from './CreateInvoiceButton';
+import { Stack } from '@mui/material';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -73,6 +75,9 @@ export default function Navbar() {
           >
             Invoice App
           </Typography>
+          <Stack direction={"row"} spacing={3}>
+
+          <CreateInvoiceButton/>
           <Search>
             <SearchIconWrapper>
               <SearchIcon />
@@ -80,8 +85,9 @@ export default function Navbar() {
             <StyledInputBase
               placeholder="Search…"
               inputProps={{ 'aria-label': 'search' }}
-            />
+              />
           </Search>
+              </Stack>
         </Toolbar>
       </AppBar>
     </Box>
