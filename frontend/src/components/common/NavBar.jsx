@@ -10,6 +10,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import CreateInvoiceButton from './CreateInvoiceButton';
 import { Stack } from '@mui/material';
+import { useState } from 'react';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -53,7 +54,12 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-export default function Navbar() {
+// eslint-disable-next-line react/prop-types
+export default function Navbar({onSearch}) {
+  const [searchText, setSearchText] = useState("");
+  const handleSearch = () => {
+    onSearch(searchText);
+  };
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -80,11 +86,14 @@ export default function Navbar() {
           <CreateInvoiceButton/>
           <Search>
             <SearchIconWrapper>
-              <SearchIcon />
+              <SearchIcon  onClick={handleSearch} />
             </SearchIconWrapper>
             <StyledInputBase
               placeholder="Search…"
               inputProps={{ 'aria-label': 'search' }}
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               />
           </Search>
               </Stack>
