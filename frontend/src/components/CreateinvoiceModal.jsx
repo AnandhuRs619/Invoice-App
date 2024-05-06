@@ -18,7 +18,7 @@ import useSnackbarAlert from '../hooks/useSnackbarAlert';
 
 // eslint-disable-next-line react/prop-types
 const CreateInvoiceModal = ({ open, onClose }) => {
-  const [invoiceNumber, setInvoiceNumber] = useState(1000+1);
+  const [invoiceNumber, setInvoiceNumber] = useState(1000);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [items, setItems] = useState([]);
   const [openAddItemModal, setOpenAddItemModal] = useState(false);
@@ -31,7 +31,7 @@ const CreateInvoiceModal = ({ open, onClose }) => {
     const calculateTotals = () => {
       let totalPrice = 0;
       let totalTax = 0;
-
+     
       items.forEach((item) => {
         const taxAmount = (item.price * item.tax) / 100;
         totalPrice += item.price;
@@ -57,8 +57,17 @@ const CreateInvoiceModal = ({ open, onClose }) => {
       return;
     }
 
+    // Retrieve saved invoices from local storage
+    const savedInvoices = JSON.parse(localStorage.getItem('invoices')) || [];
+    
+    // Extract the latest invoice number from the saved invoices data
+    const latestInvoiceNumber = savedInvoices.length > 0 ? savedInvoices[savedInvoices.length - 1].invoiceNumber : 1000;
+
+    // Calculate the next invoice number
+    const nextInvoiceNumber = latestInvoiceNumber + 1;
+
     const invoice = {
-      invoiceNumber,
+      invoiceNumber: nextInvoiceNumber,
       currentDate,
       customerName,
       items,
@@ -66,12 +75,12 @@ const CreateInvoiceModal = ({ open, onClose }) => {
       totalTax,
       grandTotal,
     };
-    const savedInvoices = JSON.parse(localStorage.getItem('invoices')) || [];
+
     const updatedInvoices = [...savedInvoices, invoice];
     localStorage.setItem('invoices', JSON.stringify(updatedInvoices));
 
-    // Resetting state values to their initial state
-    setInvoiceNumber(invoiceNumber + 1);
+    
+    setInvoiceNumber(nextInvoiceNumber); 
     setCurrentDate(new Date());
     setCustomerName('varun');
     localStorage.removeItem('items');
@@ -80,8 +89,7 @@ const CreateInvoiceModal = ({ open, onClose }) => {
     setTotalTax(0);
     setGrandTotal(0);
     onClose();
-  };
-
+};
   useEffect(() => {
     const storedItems = JSON.parse(localStorage.getItem('items'));
     if (storedItems) {
