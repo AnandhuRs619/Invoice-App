@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
@@ -14,55 +14,80 @@ import TableHead from '@mui/material/TableHead';
 import TableBody from '@mui/material/TableBody';
 import Grid from '@mui/material/Grid';
 import AddItemModal from './AddItemModal';
+import useSnackbarAlert from '../hooks/useSnackbarAlert';
 
-
+// eslint-disable-next-line react/prop-types
 const CreateInvoiceModal = ({ open, onClose }) => {
-  const [invoiceNumber, setInvoiceNumber] = useState(1000);
+  const [invoiceNumber, setInvoiceNumber] = useState(1000+1);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [items, setItems] = useState([]);
   const [openAddItemModal, setOpenAddItemModal] = useState(false);
-
   const [totalPrice, setTotalPrice] = useState(0);
   const [totalTax, setTotalTax] = useState(0);
   const [grandTotal, setGrandTotal] = useState(0);
-
+  const [customerName, setCustomerName] = useState('varun');
+  const [showAlert, SnackbarAlert] = useSnackbarAlert(); 
   useEffect(() => {
+    const calculateTotals = () => {
+      let totalPrice = 0;
+      let totalTax = 0;
+
+      items.forEach((item) => {
+        const taxAmount = (item.price * item.tax) / 100;
+        totalPrice += item.price;
+        totalTax += taxAmount;
+      });
+
+      setTotalPrice(totalPrice);
+      setTotalTax(totalTax);
+      setGrandTotal(totalPrice + totalTax);
+    };
     calculateTotals();
   }, [items]);
 
-  const calculateTotals = () => {
-    let totalPrice = 0;
-    let totalTax = 0;
-
-    items.forEach((item) => {
-      const taxAmount = (item.price * item.tax) / 100;
-      totalPrice += item.price;
-      totalTax += taxAmount;
-    });
-
-    setTotalPrice(totalPrice);
-    setTotalTax(totalTax);
-    setGrandTotal(totalPrice + totalTax);
-  };
-
   const handleAddItem = (newItem) => {
     setItems([...items, newItem]);
-   
     localStorage.setItem('items', JSON.stringify([...items, newItem]));
   };
 
- 
+  const handleSaveInvoice = () => {
+    // Perform validation
+    if (items.length === 0) {
+      showAlert('Please add at least one item before saving.', 'error');
+      return;
+    }
+
+    const invoice = {
+      invoiceNumber,
+      currentDate,
+      customerName,
+      items,
+      totalPrice,
+      totalTax,
+      grandTotal,
+    };
+    const savedInvoices = JSON.parse(localStorage.getItem('invoices')) || [];
+    const updatedInvoices = [...savedInvoices, invoice];
+    localStorage.setItem('invoices', JSON.stringify(updatedInvoices));
+
+    // Resetting state values to their initial state
+    setInvoiceNumber(invoiceNumber + 1);
+    setCurrentDate(new Date());
+    setCustomerName('varun');
+    localStorage.removeItem('items');
+    setItems([]);
+    setTotalPrice(0);
+    setTotalTax(0);
+    setGrandTotal(0);
+    onClose();
+  };
+
   useEffect(() => {
     const storedItems = JSON.parse(localStorage.getItem('items'));
     if (storedItems) {
       setItems(storedItems);
     }
   }, []);
-
-  const clearLocalStorage = () => {
-    localStorage.removeItem('items');
-    setItems([]);
-  };
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
@@ -107,28 +132,28 @@ const CreateInvoiceModal = ({ open, onClose }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-            {items.length === 0 ? (
-    <TableRow>
-      <TableCell colSpan={5} align="center">No items added yet</TableCell>
-    </TableRow>
-  ) : (
-    items.map((item) => (
-      <TableRow key={item.id}>
-        <TableCell>{item.id}</TableCell>
-        <TableCell>{item.name}</TableCell>
-        <TableCell>{item.price}</TableCell>
-        <TableCell>{item.tax}%</TableCell>
-        <TableCell>{(item.price * (1 + item.tax / 100)).toFixed(2)}</TableCell>
-      </TableRow>
-    ))
-  )}
+              {items.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} align="center">No items added yet</TableCell>
+                </TableRow>
+              ) : (
+                items.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell>{item.id}</TableCell>
+                    <TableCell>{item.name}</TableCell>
+                    <TableCell>{item.price}</TableCell>
+                    <TableCell>{item.tax}%</TableCell>
+                    <TableCell>{(item.price * (1 + item.tax / 100)).toFixed(2)}</TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </TableContainer>
         <Grid
           container
           spacing={1}
-          direction={"column"}
+          direction="column"
           alignItems="flex-end"
           justifyContent="flex-end"
           style={{ marginTop: 20 }}
@@ -146,9 +171,9 @@ const CreateInvoiceModal = ({ open, onClose }) => {
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={clearLocalStorage} color="secondary">Clear Local Storage</Button>
+        <Button onClick={handleSaveInvoice} variant="contained" color="primary">Save Invoice</Button>
       </DialogActions>
-      
+      {SnackbarAlert} 
       <AddItemModal open={openAddItemModal} onClose={() => setOpenAddItemModal(false)} onAddItem={handleAddItem} />
     </Dialog>
   );

@@ -6,36 +6,38 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
+import useSnackbarAlert from '../hooks/useSnackbarAlert';
 
+// eslint-disable-next-line react/prop-types
 const AddItemModal = ({ open, onClose, onAddItem }) => {
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [tax, setTax] = useState('');
+  const [showAlert, SnackbarAlert] = useSnackbarAlert();
 
   const handleAddItem = () => {
     // Validate input
     if (!name || !price || !tax) {
-      alert('Please fill in all fields.');
+      showAlert('Please fill in all fields.','error');
       return;
     }
 
-    // Create new item object
+ 
     const newItem = {
-      id: Math.floor(Math.random() * 1000), // Generate unique ID (temporary solution)
+      id: Math.floor(Math.random() * 1000), 
       name,
       price: parseFloat(price),
       tax: parseFloat(tax),
     };
 
-    // Pass the new item to the parent component
+   
     onAddItem(newItem);
 
-    // Clear input fields
+  
     setName('');
     setPrice('');
     setTax('');
 
-    // Close the modal
     onClose();
   };
 
@@ -49,6 +51,7 @@ const AddItemModal = ({ open, onClose, onAddItem }) => {
           value={name}
           onChange={(e) => setName(e.target.value)}
           margin="normal"
+          required
         />
         <TextField
           fullWidth
@@ -57,6 +60,7 @@ const AddItemModal = ({ open, onClose, onAddItem }) => {
           value={price}
           onChange={(e) => setPrice(e.target.value)}
           margin="normal"
+          required
         />
         <TextField
           fullWidth
@@ -65,12 +69,14 @@ const AddItemModal = ({ open, onClose, onAddItem }) => {
           value={tax}
           onChange={(e) => setTax(e.target.value)}
           margin="normal"
+          required
         />
       </DialogContent>
       <DialogActions>
         <Button onClick={handleAddItem} color="primary">Add</Button>
         <Button onClick={onClose} color="secondary">Cancel</Button>
       </DialogActions>
+      {SnackbarAlert}
     </Dialog>
   );
 };

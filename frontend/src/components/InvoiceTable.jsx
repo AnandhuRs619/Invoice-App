@@ -1,51 +1,57 @@
-
+import { useEffect, useState } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 
 const columns = [
-  { field: 'id', headerName: 'Invoice No', width: 140 },
-  { field: 'customername', headerName: 'Customer Name', width: 130 },
-  { field: 'total', headerName: 'Total', type: 'number', width: 260 },
-  {
-    field: 'tax',
-    headerName: 'Tax',
-    type: 'number',
-    width: 130,
-  },
-  {
-    field: 'grandtotal',
-    headerName: 'Grand Total',
-    type: 'number',
-    width: 130,
-  },
-
-];
-
-const rows = [
-  { id: 1, customername: 'Snow', total: '1000.00', tax: '5.00',grandtotal: '1005.00' },
-  { id: 2, customername: 'Lannister', total: '300',tax: '5.00', grandtotal: '1005.00' },
-  { id: 3, customername: 'Lannister', total: '244',tax: '5.00', grandtotal: '1005.00' },
-  { id: 4, customername: 'Stark', total: '173',tax: '5.00', grandtotal: '1005.00' },
-  { id: 5, customername: 'Targaryen', total: '2432',tax: '5.00', grandtotal: '1005.00' },
-  { id: 6, customername: 'Melisandre', total: null,tax: '5.00', grandtotal: '1005.00' },
-  { id: 7, customername: 'Clifford', total: 'Ferrara', grandtotal: '1005.00' },
-  { id: 8, customername: 'Frances', total: 'Rossini', grandtotal: '1005.00'},
-  { id: 9, customername: 'Roxie', total: 'Harvey',grandtotal: '1005.00' },
+  { field: 'invoiceNumber', headerName: 'Invoice No', width: 140 },
+  { field: 'currentDate', headerName: 'Date', width: 140 },
+  { field: 'customerName', headerName: 'Customer Name', width: 130 },
+  { field: 'totalPrice', headerName: 'Total', type: 'number', width: 260 },
+  { field: 'totalTax', headerName: 'Tax', type: 'number', width: 130 },
+  { field: 'grandTotal', headerName: 'Grand Total', type: 'number', width: 130 },
 ];
 
 export default function InvoiceTable() {
+  const [rows, setRows] = useState([]);
+
+  useEffect(() => {
+    // Retrieve data from local storage
+    const storedInvoices = JSON.parse(localStorage.getItem('invoices')) || [];
+
+    // If there are no invoices, set rows state to an empty array
+    if (storedInvoices.length === 0) {
+      setRows([]);
+    } else {
+      // If there are invoices, map them to fit the columns format
+      const formattedRows = storedInvoices.map((invoice, index) => ({
+        id: index + 1,
+        ...invoice,
+      }));
+
+      // Set the rows state with the formatted invoices
+      setRows(formattedRows);
+    }
+  }, []);
+
   return (
     <div style={{ height: 400, width: '100%' }}>
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        initialState={{
-          pagination: {
-            paginationModel: { page: 0, pageSize: 5 },
-          },
-        }}
-        pageSizeOptions={[5, 10]}
-        checkboxSelection
-      />
+      {rows.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: '20px' }}>
+          <p>No data available. Add some invoices to display.</p>
+        </div>
+      ) : (
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          initialState={{
+            pagination: {
+              paginationModel: { page: 0, pageSize: 5 },
+            },
+          }}
+          pageSizeOptions={[5, 10]}
+          checkboxSelection
+  
+        />
+      )}
     </div>
   );
 }
