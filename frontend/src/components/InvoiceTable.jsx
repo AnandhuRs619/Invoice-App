@@ -7,7 +7,7 @@ const columns = [
   { field: "currentDate", headerName: "Date", width: 140 },
   { field: "customerName", headerName: "Customer Name", width: 240 },
   { field: "totalPrice", headerName: "Total", type: "number", width: 250 },
-  { field: "totalTax", headerName: "Tax", type: "number", width: 130 },
+  { field: "totalTax", headerName: "Tax %", type: "number", width: 130 },
   {
     field: "grandTotal",
     headerName: "Grand Total",
