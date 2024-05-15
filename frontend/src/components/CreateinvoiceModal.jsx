@@ -28,6 +28,7 @@ const CreateInvoiceModal = ({ open, onClose }) => {
   const [customerName, setCustomerName] = useState("varun");
   const [showAlert, SnackbarAlert] = useSnackbarAlert();
   useEffect(() => {
+    // Calculate totals for the invoice
     const calculateTotals = () => {
       let totalPrice = 0;
       let totalTax = 0;
@@ -57,6 +58,7 @@ const CreateInvoiceModal = ({ open, onClose }) => {
      setInvoiceNumber(nextInvoiceNumber);
   }, [items]);
 
+// Add new item to the items list and save to local storage
   const handleAddItem = (newItem) => {
     setItems([...items, newItem]);
     localStorage.setItem("items", JSON.stringify([...items, newItem]));
@@ -68,7 +70,7 @@ const CreateInvoiceModal = ({ open, onClose }) => {
       showAlert("Please add at least one item before saving.", "error");
       return;
     }
-
+ // Create a new invoice object
     const invoice = {
       invoiceNumber: invoiceNumber,
       currentDate,
@@ -78,6 +80,8 @@ const CreateInvoiceModal = ({ open, onClose }) => {
       totalTax,
       grandTotal,
     };
+
+     // Retrieve saved invoices from local storage and update with the new invoice
     const savedInvoices = JSON.parse(localStorage.getItem("invoices")) || [];
     const updatedInvoices = [...savedInvoices, invoice];
     localStorage.setItem("invoices", JSON.stringify(updatedInvoices));
@@ -95,6 +99,7 @@ const CreateInvoiceModal = ({ open, onClose }) => {
   };
 
   useEffect(() => {
+    // Retrieve stored items from local storage
     const storedItems = JSON.parse(localStorage.getItem("items"));
     if (storedItems) {
       setItems(storedItems);

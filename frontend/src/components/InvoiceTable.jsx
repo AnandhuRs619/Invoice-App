@@ -20,6 +20,7 @@ const columns = [
 export default function InvoiceTable({ searchText }) {
   const [rows, setRows] = useState([]);
 
+  // Retrieve invoices from local storage
   useEffect(() => {
     const storedInvoices =
       JSON.parse(localStorage.getItem("invoices")) || [];
@@ -27,6 +28,7 @@ export default function InvoiceTable({ searchText }) {
     if (storedInvoices.length === 0) {
       setRows([]);
     } else {
+       // Format rows for DataGrid
       const formattedRows = storedInvoices.map((invoice, index) => ({
         id: index + 1,
         ...invoice,
@@ -35,7 +37,7 @@ export default function InvoiceTable({ searchText }) {
       setRows(formattedRows);
     }
   }, []);
-
+  // Filter rows based on searchText
   const filteredRows = rows.filter((row) =>
     Object.values(row).some((value) =>
       // eslint-disable-next-line react/prop-types
